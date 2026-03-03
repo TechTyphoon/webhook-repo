@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RepoPulse - GitHub Webhook Monitor</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>&#128293; RepoPulse</h1>
+            <p class="subtitle">Real-time GitHub Activity Monitor</p>
+            <div class="status-bar">
+                <span id="status-dot" class="dot dot-active"></span>
+                <span id="status-text">Polling every 15 seconds...</span>
+                <span id="last-updated" class="last-updated"></span>
+            </div>
+        </header>
+
+        <main>
+            <div id="events-container">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Waiting for events...</p>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>RepoPulse &mdash; Webhook Receiver &amp; Monitor</p>
+        </footer>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
