@@ -19,6 +19,10 @@ def create_app():
     mongo.init_app(app)
     CORS(app)
 
+    # Ensure a descending index on timestamp for efficient polling queries
+    with app.app_context():
+        mongo.db.events.create_index([("timestamp", -1)])
+
     # Register blueprints
     app.register_blueprint(webhook)
 

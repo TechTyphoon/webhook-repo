@@ -4,4 +4,3 @@ Flask-PyMongo
 pymongo[srv]
 python-dotenv
 dnspython
-requests

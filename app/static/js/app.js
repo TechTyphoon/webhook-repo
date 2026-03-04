@@ -1,7 +1,14 @@
 const POLL_INTERVAL = 15000; // 15 seconds
 const EVENTS_URL = '/webhook/events';
 
-let previousEvents = [];
+// Track the timestamp of the newest event we've already displayed,
+// so that each poll only requests events newer than this value.
+// This satisfies the requirement: "don't display data that was
+// already displayed earlier & falls outside the time window for refresh."
+let latestTimestamp = null;
+
+// All events currently rendered on screen (newest first)
+let displayedEvents = [];
 
 function formatTimestamp(isoString) {
     const date = new Date(isoString);
@@ -81,37 +88,71 @@ function createEventCard(event) {
     return card;
 }
 
-function updateUI(events) {
+/**
+ * Appends only the NEW events (received since the last poll) to the
+ * top of the dashboard.  Previously displayed events stay in place,
+ * avoiding duplicate renders and satisfying the refresh-window rule.
+ *
+ * @param {Array} newEvents - events returned by the latest poll
+ */
+function updateUI(newEvents) {
     const container = document.getElementById('events-container');
 
-    if (events.length === 0) {
+    // First load — nothing displayed yet
+    if (displayedEvents.length === 0 && newEvents.length === 0) {
         container.innerHTML = '<div class="no-events">No events yet. Push, create a PR, or merge on the action-repo to see activity here.</div>';
         return;
     }
 
-    // Only re-render if data changed
-    const eventsJson = JSON.stringify(events);
-    if (eventsJson === JSON.stringify(previousEvents)) {
+    // Nothing new since last poll
+    if (newEvents.length === 0) {
         return;
     }
-    previousEvents = events;
 
-    container.innerHTML = '';
-    events.forEach(event => {
-        container.appendChild(createEventCard(event));
-    });
+    // Clear the placeholder / "no events" message on first real data
+    if (displayedEvents.length === 0) {
+        container.innerHTML = '';
+    }
+
+    // newEvents are sorted newest-first from the API.
+    // We prepend them in reverse order so the newest ends up on top.
+    for (let i = newEvents.length - 1; i >= 0; i--) {
+        const card = createEventCard(newEvents[i]);
+        container.prepend(card);
+    }
+
+    // Merge into our local list (newest first)
+    displayedEvents = [...newEvents, ...displayedEvents];
+
+    // Update the high-water mark so the next poll only fetches newer events
+    latestTimestamp = displayedEvents[0].timestamp;
 }
 
+/**
+ * Polls the /webhook/events endpoint for new events.
+ * On the first call, fetches all existing events.
+ * On subsequent calls, passes the 'after' parameter so the server
+ * only returns events newer than what we already have.
+ */
 async function fetchEvents() {
     try {
-        const response = await fetch(EVENTS_URL);
-        if (response.ok) {
-            const events = await response.json();
-            updateUI(events);
+        // Build the URL — include 'after' param if we already have events
+        let url = EVENTS_URL;
+        if (latestTimestamp) {
+            url += `?after=${encodeURIComponent(latestTimestamp)}`;
         }
+
+        const response = await fetch(url);
+        if (response.ok) {
+            const newEvents = await response.json();
+            updateUI(newEvents);
+        }
+
+        // Update status indicators
         document.getElementById('status-dot').className = 'dot dot-active';
         document.getElementById('status-text').textContent = 'Polling every 15 seconds...';
-        document.getElementById('last-updated').textContent = `Last check: ${new Date().toLocaleTimeString()}`;
+        document.getElementById('last-updated').textContent =
+            `Last check: ${new Date().toLocaleTimeString()}`;
     } catch (error) {
         console.error('Error fetching events:', error);
         document.getElementById('status-dot').className = 'dot';
@@ -120,6 +161,6 @@ async function fetchEvents() {
     }
 }
 
-// Initial fetch and start polling
+// Initial fetch (loads all existing events) then poll every 15 seconds
 fetchEvents();
 setInterval(fetchEvents, POLL_INTERVAL);

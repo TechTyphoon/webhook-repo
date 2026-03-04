@@ -44,12 +44,24 @@ def receiver():
 @webhook.route('/events', methods=["GET"])
 def get_events():
     """
-    Returns all stored events from MongoDB, sorted by timestamp (newest first).
+    Returns stored events from MongoDB, sorted by timestamp (newest first).
     The UI polls this endpoint every 15 seconds.
+
+    Query Parameters:
+        after (str, optional): ISO timestamp. If provided, only events
+                               with a timestamp strictly greater than this
+                               value are returned. This prevents the UI
+                               from re-fetching data it has already displayed.
     """
     try:
+        # Build query filter — only fetch events newer than 'after' timestamp
+        query_filter = {}
+        after = request.args.get('after')
+        if after:
+            query_filter['timestamp'] = {'$gt': after}
+
         events = list(
-            mongo.db.events.find({}, {"_id": 0}).sort("timestamp", -1)
+            mongo.db.events.find(query_filter, {"_id": 0}).sort("timestamp", -1)
         )
     except Exception:
         events = []
