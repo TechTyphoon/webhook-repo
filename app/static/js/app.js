@@ -36,7 +36,7 @@ function createEventCard(event) {
         case 'PUSH':
             actionText = `<span class="author">"${event.author}"</span>
                 <span class="action-verb">pushed to</span>
-                <span class="branch">${event.to_branch}</span>`;
+                <span class="branch">"${event.to_branch}"</span>`;
             badgeClass = 'badge-push';
             badgeLabel = 'Push';
             break;
@@ -44,9 +44,9 @@ function createEventCard(event) {
         case 'PULL_REQUEST':
             actionText = `<span class="author">"${event.author}"</span>
                 <span class="action-verb">submitted a pull request from</span>
-                <span class="branch">${event.from_branch}</span>
+                <span class="branch">"${event.from_branch}"</span>
                 <span class="action-verb">to</span>
-                <span class="branch">${event.to_branch}</span>`;
+                <span class="branch">"${event.to_branch}"</span>`;
             badgeClass = 'badge-pr';
             badgeLabel = 'Pull Request';
             break;
@@ -54,9 +54,9 @@ function createEventCard(event) {
         case 'MERGE':
             actionText = `<span class="author">"${event.author}"</span>
                 <span class="action-verb">merged branch</span>
-                <span class="branch">${event.from_branch}</span>
+                <span class="branch">"${event.from_branch}"</span>
                 <span class="action-verb">to</span>
-                <span class="branch">${event.to_branch}</span>`;
+                <span class="branch">"${event.to_branch}"</span>`;
             badgeClass = 'badge-merge';
             badgeLabel = 'Merge';
             break;
