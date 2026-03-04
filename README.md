@@ -2,6 +2,11 @@
 
 A Flask-based GitHub webhook receiver that listens for repository events (Push, Pull Request, Merge), stores them in MongoDB, and provides a real-time dashboard that polls for updates every 15 seconds.
 
+## Submission Links
+
+- **action-repo:** [https://github.com/TechTyphoon/action-repo](https://github.com/TechTyphoon/action-repo)
+- **webhook-repo:** [https://github.com/TechTyphoon/webhook-repo](https://github.com/TechTyphoon/webhook-repo)
+
 ## Features
 
 - **Webhook Receiver** — Receives GitHub webhook events at `/webhook/receiver`
