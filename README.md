@@ -7,6 +7,10 @@ A Flask-based GitHub webhook receiver that listens for repository events (Push, 
 - **action-repo:** [https://github.com/TechTyphoon/action-repo](https://github.com/TechTyphoon/action-repo)
 - **webhook-repo:** [https://github.com/TechTyphoon/webhook-repo](https://github.com/TechTyphoon/webhook-repo)
 
+## Dashboard Preview
+
+![RepoPulse Dashboard](screenshot.png)
+
 ## Features
 
 - **Webhook Receiver** — Receives GitHub webhook events at `/webhook/receiver`
