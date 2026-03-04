@@ -5,17 +5,23 @@ let previousEvents = [];
 
 function formatTimestamp(isoString) {
     const date = new Date(isoString);
-    const options = {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true,
-        timeZone: 'UTC',
-        timeZoneName: 'short'
-    };
-    return date.toLocaleString('en-US', options);
+    const day = date.getUTCDate();
+    const months = ['January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'];
+    const month = months[date.getUTCMonth()];
+    const year = date.getUTCFullYear();
+
+    // Ordinal suffix
+    const suffix = (day === 1 || day === 21 || day === 31) ? 'st'
+        : (day === 2 || day === 22) ? 'nd'
+        : (day === 3 || day === 23) ? 'rd' : 'th';
+
+    let hours = date.getUTCHours();
+    const minutes = date.getUTCMinutes().toString().padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12 || 12;
+
+    return `${day}${suffix} ${month} ${year} - ${hours}:${minutes} ${ampm} UTC`;
 }
 
 function createEventCard(event) {
@@ -63,10 +69,12 @@ function createEventCard(event) {
     }
 
     card.innerHTML = `
-        <div class="event-text">${actionText}</div>
+        <div class="event-text">${actionText}
+            <span class="action-verb">on</span>
+            <span class="timestamp">${formatTimestamp(event.timestamp)}</span>
+        </div>
         <div class="event-meta">
             <span class="event-badge ${badgeClass}">${badgeLabel}</span>
-            <span>${formatTimestamp(event.timestamp)}</span>
         </div>
     `;
 
